@@ -1,5 +1,5 @@
 import { ActionFunction, json, redirect } from '@remix-run/node'
-import { Form, useActionData } from '@remix-run/react'
+import { Form, useActionData, useTransition } from '@remix-run/react'
 import React from 'react'
 import invariant from 'tiny-invariant';
 import { createPost } from '~/model/posts.server';
@@ -33,6 +33,8 @@ export const action:ActionFunction=async({request})=>{
 }
 export default function newPostRoutes ()  {
     const error = useActionData() as ActionData;
+    const transition = useTransition();
+    const isCreatign = Boolean(transition.submission)
   return (
     <div>
         <Form method='post'>
@@ -42,7 +44,9 @@ export default function newPostRoutes ()  {
             <input name='slug'/>
             <label>Markdown { error?.markdown?<em style={{color:'red'}}>{error.markdown}</em>:null}</label>
             <input name='markdown'/>
-            <button type='submit'>Create post</button>
+            <button type='submit'
+            disabled={isCreatign}
+            >{isCreatign ? 'Creating ...' : "Create post"}</button>
         </Form>
     </div>
   )
