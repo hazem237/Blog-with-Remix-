@@ -21,7 +21,7 @@ const admin = () => {
         <ul>
           {posts.map((p) => (
             <li>
-              <Link key={p.title} to={`./posts/${p.slug}`}>
+              <Link key={p.title} to={`./${p.slug}`}>
                 {p.title}
               </Link>
             </li>

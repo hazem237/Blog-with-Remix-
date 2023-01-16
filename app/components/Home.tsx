@@ -14,7 +14,7 @@ const Home = ({ posts } : prop[]) => {
       <ul>
         {posts.map((p) => (
           <li>
-            <Link key={p.title} to={`./posts/${p.slug}`}>
+            <Link key={p.title} to={`./posts/${p.slug}`} >
               {p.title}
             </Link>
           </li>
