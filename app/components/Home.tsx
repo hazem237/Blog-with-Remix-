@@ -1,19 +1,11 @@
-import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
 import React from "react";
 import { Link } from "react-router-dom";
-import getPosts from "~/model/posts.server";
 
-type LoderData = {
-  posts: Awaited<ReturnType<typeof getPosts>>;
+type prop = {
+  title: string;
+  slug: string;
 };
-
-export const loader: LoaderFunction = async () => {
-  const posts = await getPosts();
-  return json<LoderData>({ posts });
-};
-const Home = () => {
-  const { posts } = useLoaderData() 
+const Home = ({ posts } : prop[]) => {
   return (
     <div>
       <h1>Welcome to Blog site</h1>
