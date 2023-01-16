@@ -12,7 +12,13 @@ import {
 } from "@remix-run/react";
 import React from "react";
 import invariant from "tiny-invariant";
-import { createPost, getPostBasedSlug, getPosts, updatePost } from "~/model/posts.server";
+import {
+  createPost,
+  deletePost,
+  getPostBasedSlug,
+  getPosts,
+  updatePost,
+} from "~/model/posts.server";
 
 type ActionData =
   | {
@@ -21,43 +27,63 @@ type ActionData =
       markdown: null | string;
     }
   | undefined;
+
+
 export const loader: LoaderFunction = async ({ params }) => {
+    console.log(params.slug)
   if (params.slug === "new") {
     return json({});
   }
-
   const posts = await getPostBasedSlug(params.slug);
   return json({ posts });
 };
 export const action: ActionFunction = async ({ request, params }) => {
   const dataForm = await request.formData();
-  const slug = dataForm.get("slug");
-  const title = dataForm.get("title");
-  const markdown = dataForm.get("markdown");
-  const error: ActionData = {
-    slug: slug ? null : "slug is required",
-    title: title ? null : "title is reqired",
-    markdown: markdown ? null : "markdown is required",
-  };
-  const hasError = Object.values(error).some((el) => el);
-  if (hasError) {
-    return json<ActionData>(error);
+  const intent = dataForm.get('intent')
+  if(intent =='delete')
+  {
+    await deletePost(params.slug)
+    redirect('/posts/admin')
   }
-  invariant(typeof slug === "string", "slug must be String");
-  invariant(typeof title === "string", "title must be String");
-  invariant(typeof markdown === "string", "markdown must be String");
-  if (params.slug == "new") {
-    createPost({ slug: slug, title: title, markdown: markdown });
-  } else {
-     await updatePost(params.slug , {slug:slug , title:title , markdown:markdown})
+  else
+  {
+    const slug = dataForm.get("slug");
+    const title = dataForm.get("title");
+    const markdown = dataForm.get("markdown");
+    const error: ActionData = {
+      slug: slug ? null : "slug is required",
+      title: title ? null : "title is reqired",
+      markdown: markdown ? null : "markdown is required",
+    };
+    const hasError = Object.values(error).some((el) => el);
+    if (hasError) {
+      return json<ActionData>(error);
+    }
+    invariant(typeof slug === "string", "slug must be String");
+    invariant(typeof title === "string", "title must be String");
+    invariant(typeof markdown === "string", "markdown must be String");
+  
+    if (params.slug == "new") {
+      createPost({ slug: slug, title: title, markdown: markdown });
+    } else {
+      invariant(typeof params.slug === "string", "must be string");
+      await updatePost(params.slug, {
+        slug: slug,
+        title: title,
+        markdown: markdown,
+      });
+    }
+   
   }
   return redirect("/posts/admin");
 };
 export default function newPostRoutes() {
   const error = useActionData() as ActionData;
   const transition = useTransition();
-  const isCreatign = Boolean(transition.submission);
+  const isCreating = transition.submission?.formData.get('intent')=='Create Post'
+  const isUpdating = transition.submission?.formData.get('intent')=='Update Post'
   const data = useLoaderData();
+  const isNewPost = !data.post
   return (
     <div>
       <Form method="post" key={data.posts?.slug ?? "new"}>
@@ -73,7 +99,7 @@ export default function newPostRoutes() {
           Slug{" "}
           {error?.slug ? <em style={{ color: "red" }}>{error.slug}</em> : null}
         </label>
-        <input name="slug" defaultValue={data.posts?.slug}  />
+        <input name="slug" defaultValue={data.posts?.slug} />
         <label>
           Markdown{" "}
           {error?.markdown ? (
@@ -81,9 +107,15 @@ export default function newPostRoutes() {
           ) : null}
         </label>
         <input name="markdown" defaultValue={data.posts?.markdown} />
-        <button type="submit" disabled={isCreatign}>
-          {isCreatign ? "Creating ..." : "Create post"}
+        <button type="submit" disabled={isCreating} name="intent" value={isNewPost? "Create Post" : "Update Post"}>
+          {data.post?.title
+            ? "Update Post"
+            : isCreating
+            ? "Creating ..."
+            : "Create post"}
         </button>
+       <button  type='submit' name="intent" value={'delete'}>Delete</button>
+       
       </Form>
     </div>
   );

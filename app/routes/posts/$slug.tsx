@@ -23,7 +23,7 @@ export default function RoutesPost () {
         <main>
             <div>{title}</div>
             <div dangerouslySetInnerHTML={{__html:html}}/>
-            <Link to={''}>
+            <Link to={'../'}>
                 Home
             </Link>
         </main>
