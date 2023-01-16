@@ -12,7 +12,7 @@ import {
 } from "@remix-run/react";
 import React from "react";
 import invariant from "tiny-invariant";
-import { createPost, getPostBasedSlug, getPosts } from "~/model/posts.server";
+import { createPost, getPostBasedSlug, getPosts, updatePost } from "~/model/posts.server";
 
 type ActionData =
   | {
@@ -49,7 +49,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   if (params.slug == "new") {
     createPost({ slug: slug, title: title, markdown: markdown });
   } else {
-    /**/
+     await updatePost(params.slug , {slug:slug , title:title , markdown:markdown})
   }
   return redirect("/posts/admin");
 };
