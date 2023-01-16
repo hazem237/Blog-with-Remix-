@@ -1,11 +1,10 @@
-import { prisma, PrismaClient } from "@prisma/client";
+import {  PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export  async function getPosts() {
-  const prisma = new PrismaClient();
   return prisma.post.findMany();
 }
 export  async function getPostsHome() {
-    const prisma = new PrismaClient();
     return prisma.post.findMany({
         select :{
             slug:true ,
@@ -16,8 +15,11 @@ export  async function getPostsHome() {
 
 export function getPostBasedSlug(slug:string)
 {
-    const prisma = new PrismaClient();
     return prisma.post.findUnique({
         where:{slug}
     })
+}
+export async function createPost(post)
+{
+   return prisma.post.create({data:post})
 }

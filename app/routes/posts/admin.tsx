@@ -14,7 +14,7 @@ type LoderData = {
   };
 
 const admin = () => {
-    const { posts } = useLoaderData();
+    const { posts } :LoderData = useLoaderData() ;
     return (
       <div>
         <h1>Admin</h1>
