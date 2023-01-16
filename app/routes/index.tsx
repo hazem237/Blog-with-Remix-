@@ -1,3 +1,4 @@
+import { Link } from "@remix-run/react";
 import { json, LoaderFunction, useLoaderData } from "react-router";
 
 import getPosts from "~/model/posts.server";
